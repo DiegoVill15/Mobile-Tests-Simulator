@@ -1,0 +1,48 @@
+{
+  "name": "saucelabs-mydemo-mobile-automation",
+  "version": "1.0.0",
+  "description": "Cross-platform mobile test automation (Android + iOS) with Appium, WebdriverIO, TypeScript and the Page Object Model, running on emulators/simulators and in GitHub Actions CI.",
+  "author": "Diego Villalobos",
+  "license": "MIT",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "npm run test:android",
+    "test:android": "wdio run config/wdio.android.conf.ts",
+    "test:ios": "wdio run config/wdio.ios.conf.ts",
+    "apps:download": "bash scripts/download-apps.sh",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "appium",
+    "webdriverio",
+    "mobile-automation",
+    "android",
+    "ios",
+    "uiautomator2",
+    "xcuitest",
+    "page-object-model",
+    "typescript",
+    "github-actions"
+  ],
+  "devDependencies": {
+    "@types/node": "^24.13.5",
+    "@wdio/allure-reporter": "^9.31.4",
+    "@wdio/appium-service": "^9.31.9",
+    "@wdio/cli": "^9.31.9",
+    "@wdio/globals": "^9.31.3",
+    "@wdio/local-runner": "^9.31.9",
+    "@wdio/mocha-framework": "^9.31.9",
+    "@wdio/spec-reporter": "^9.31.2",
+    "@wdio/types": "^9.31.2",
+    "allure-commandline": "^2.46.1",
+    "appium": "^3.7.0",
+    "appium-uiautomator2-driver": "^8.7.0",
+    "appium-xcuitest-driver": "^12.12.5",
+    "dotenv": "^18.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}

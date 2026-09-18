@@ -1,0 +1,21 @@
+node_modules/
+
+# App binaries (downloaded via `npm run apps:download`)
+apps/*.apk
+apps/*.ipa
+apps/*.zip
+apps/ios/
+
+# Test reports / artifacts
+reports/
+logs/
+*.log
+allure-results/
+allure-report/
+
+# Environment
+.env
+.env.*
+
+# macOS
+.DS_Store
