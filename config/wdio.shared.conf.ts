@@ -27,4 +27,14 @@ export const config: Options.Testrunner = {
     ui: 'bdd',
     timeout: 120_000,
   },
+
+  /**
+   * Reset the app before every test so tests do not depend on the state left by
+   * a previous one (e.g. being logged in, or the login autofill list no longer
+   * being rendered after a failed attempt).
+   */
+  beforeTest: async function () {
+    const { resetApp } = await import('../test/support/app')
+    await resetApp()
+  },
 }
