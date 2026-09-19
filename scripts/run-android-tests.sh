@@ -28,5 +28,11 @@ fi
 export ANDROID_UDID
 echo "Running Android tests against emulator: ${ANDROID_UDID}"
 
+# Preserve Android system errors even when WebdriverIO exits unsuccessfully.
+collect_logcat() {
+  adb -s "${ANDROID_UDID}" logcat -d -v threadtime > logs/android-logcat.log 2>&1 || true
+}
+trap collect_logcat EXIT
+
 npx wdio run config/wdio.android.conf.ts --waitforTimeout 20000 2>&1 \
   | tee logs/android-tests.log
