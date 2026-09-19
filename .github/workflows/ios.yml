@@ -1,0 +1,51 @@
+name: iOS CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+      - 'ci/**'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ios:
+    name: iOS tests
+    # Must be an Apple Silicon runner: the iOS app under test is an arm64 build
+    # and the RN artifact is x86_64-only, which cannot run on arm64 simulators.
+    runs-on: macos-14
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download app under test
+        run: bash scripts/download-apps.sh
+
+      - name: Run iOS tests
+        run: bash scripts/run-ios-tests.sh
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-test-logs
+          path: logs/
+          if-no-files-found: ignore
