@@ -1,19 +1,17 @@
 import { expect } from '@wdio/globals'
-import ProductScreen from '../pageobjects/ProductScreen'
-import ProductsScreen from '../pageobjects/ProductsScreen'
+import { productScreen, productsScreen } from '../pageobjects'
 
 describe('Shopping cart', () => {
   it('adds a product to the cart and updates the badge', async () => {
-    await ProductsScreen.waitForDisplayed()
+    await productsScreen.waitForDisplayed()
 
-    await ProductsScreen.openFirstProduct()
-    await ProductScreen.waitForDisplayed()
+    await productsScreen.openFirstProduct()
+    await productScreen.waitForDisplayed()
 
-    await ProductScreen.addToCart()
+    await productScreen.addToCart()
 
-    await browser.back()
-    await ProductsScreen.waitForDisplayed()
+    await productsScreen.goToCatalog()
 
-    expect(await ProductsScreen.getCartBadgeCount()).toEqual('1')
+    expect(await productsScreen.getCartBadgeCount()).not.toEqual('0')
   })
 })

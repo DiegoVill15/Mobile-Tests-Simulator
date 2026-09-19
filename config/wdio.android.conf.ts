@@ -21,5 +21,9 @@ if (process.env.ANDROID_UDID) {
 
 export const config: WebdriverIO.Config = {
   ...sharedConfig,
+  specs: [
+    ...(sharedConfig.specs as string[]),
+    path.join(process.cwd(), 'test/specs/android/*.spec.ts'),
+  ],
   capabilities: [capabilities],
 }
