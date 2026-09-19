@@ -10,7 +10,8 @@ const capabilities: WebdriverIO.Capabilities = {
   'appium:platformVersion': process.env.IOS_PLATFORM_VERSION ?? '27.0',
   'appium:app': appPath,
   'appium:newCommandTimeout': 240,
-  'appium:wdaLaunchTimeout': 120_000,
+  'appium:wdaLaunchTimeout': 240_000,
+  'appium:wdaConnectionTimeout': 240_000,
 }
 
 if (process.env.IOS_UDID) {
@@ -24,4 +25,10 @@ export const config: WebdriverIO.Config = {
     path.join(process.cwd(), 'test/specs/ios/*.spec.ts'),
   ],
   capabilities: [capabilities],
+  /**
+   * The very first session on a fresh CI runner has to build and start
+   * WebDriverAgent, which can take several minutes (cold start). The shared
+   * 120s connection timeout is not enough.
+   */
+  connectionRetryTimeout: 300_000,
 }
