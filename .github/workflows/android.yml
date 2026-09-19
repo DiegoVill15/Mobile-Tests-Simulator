@@ -58,11 +58,23 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           disable-animations: true
           script: |
+            bash -euo pipefail <<'BASH'
             mkdir -p logs
-            export ANDROID_UDID="$(adb devices | awk 'NR==2 {print $1}')"
+
+            ANDROID_UDID="$(adb devices | awk '$2 == "device" { print $1; exit }')"
+            if [ -z "${ANDROID_UDID}" ]; then
+              echo "No online Android emulator found"
+              adb devices
+              exit 1
+            fi
+
+            export ANDROID_UDID
+            export ANDROID_SERIAL="${ANDROID_UDID}"
             echo "Running against emulator: ${ANDROID_UDID}"
-            set -o pipefail
-            npx wdio run config/wdio.android.conf.ts --waitforTimeout 20000 2>&1 | tee logs/android-tests.log
+
+            npx wdio run config/wdio.android.conf.ts --waitforTimeout 20000 2>&1 \
+              | tee logs/android-tests.log
+            BASH
 
       - name: Upload test logs
         if: always()
