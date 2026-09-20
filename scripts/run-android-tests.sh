@@ -27,6 +27,19 @@ fi
 
 export ANDROID_UDID
 echo "Running Android tests against emulator: ${ANDROID_UDID}"
+echo "Waiting for the emulator to report boot completed..."
+adb -s "${ANDROID_UDID}" wait-for-device
+for _ in $(seq 1 60); do
+  if [ "$(adb -s "${ANDROID_UDID}" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ]; then
+    break
+  fi
+  sleep 2
+done
+if [ "$(adb -s "${ANDROID_UDID}" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" != "1" ]; then
+  echo "Emulator did not finish booting within 120s" >&2
+  exit 1
+fi
+echo "Boot completed."
 
 # Preserve Android system errors even when WebdriverIO exits unsuccessfully.
 collect_logcat() {

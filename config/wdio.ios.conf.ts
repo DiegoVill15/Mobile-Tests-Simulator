@@ -41,9 +41,13 @@ export const config: WebdriverIO.Config = {
   ],
   capabilities: [capabilities],
   /**
-   * The very first session on a fresh CI runner has to build and start
-   * WebDriverAgent, which can take several minutes (cold start). The shared
-   * 120s connection timeout is not enough.
+   * Give Appium more time to come up. On a loaded macOS CI runner the default
+   * 30s is not always enough and the run fails with "Appium did not start
+   * within expected time" before any test can run.
+   */
+  services: [['appium', { appiumStartTimeout: 120_000 }]],
+  /**
+   * Keep extra room for simulator startup and Appium session creation on CI.
    */
   connectionRetryTimeout: 300_000,
 }

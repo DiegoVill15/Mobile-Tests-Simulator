@@ -69,7 +69,26 @@ export IOS_PREBUILT_WDA
 echo "Using prebuilt WebDriverAgent: ${IOS_PREBUILT_WDA}"
 
 echo "Booting simulator: ${IOS_DEVICE_NAME} (iOS ${IOS_PLATFORM_VERSION}) [${IOS_UDID}]"
-xcrun simctl bootstatus "${IOS_UDID}" -b
+xcrun simctl boot "${IOS_UDID}" 2>/dev/null || true
+
+BOOTED=false
+for _ in $(seq 1 90); do
+  if xcrun simctl bootstatus "${IOS_UDID}" 2>/dev/null | grep -q "Booted"; then
+    BOOTED=true
+    break
+  fi
+  if [ "$(xcrun simctl list devices | grep "${IOS_UDID}" | grep -c "Booted")" -gt 0 ]; then
+    BOOTED=true
+    break
+  fi
+  sleep 2
+done
+if [ "${BOOTED}" != "true" ]; then
+  echo "Simulator ${IOS_UDID} did not finish booting" >&2
+  xcrun simctl list devices | grep "${IOS_UDID}" || true
+  exit 1
+fi
+echo "Simulator booted."
 
 npx wdio run config/wdio.ios.conf.ts --waitforTimeout 20000 2>&1 \
   | tee logs/ios-tests.log
