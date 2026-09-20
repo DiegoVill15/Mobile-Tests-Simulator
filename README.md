@@ -39,7 +39,7 @@ suite executing on **both platforms** and reports published from CI.
 
 ```
 config/
-  wdio.shared.conf.ts      # shared config: specs, timeouts, reset, reporting
+  wdio.shared.conf.ts      # shared config: specs, timeouts, reporting
   wdio.android.conf.ts     # Android capabilities
   wdio.ios.conf.ts         # iOS capabilities
 scripts/
@@ -59,8 +59,6 @@ test/
     add-to-cart.spec.ts    # shared flow
     android/login.spec.ts  # Android-specific: inline error
     ios/login.spec.ts      # iOS-specific: native alert
-  support/
-    app.ts                 # resetApp(): isolates each test
 pages/
   index.html               # landing page for the published reports
 .github/workflows/
@@ -139,21 +137,18 @@ Real problems found while getting the suite green on CI, and how they were solve
 - **iOS simulator build.** The React Native iOS artifact is x86_64-only, so it
   cannot run on arm64 Apple Silicon simulators or `macos-14` runners. The suite
   uses the native arm64 build instead.
-- **Emulator ANR on reset.** `terminate → clearApp → activate` raced with the
-  system launcher on the slow CI emulator and triggered a *"Pixel Launcher isn't
-  responding"* dialog that covered the app and failed every test. Clearing app
-  data was dropped; restarting the process is enough to reset the session state
-  tests depend on.
-- **Cold boot.** A fresh emulator is slow and prone to the ANR above. CI caches
+- **Emulator ANR from the per-test reset.** To isolate tests we restarted the app
+  before each one (`terminate → activate`). On the CI emulator that cycle raced
+  with the system launcher and triggered a *"Pixel Launcher isn't responding"*
+  dialog that covered the app and failed every test. Since each spec already
+  runs in its **own session** (WebdriverIO launches the app per worker), the
+  reset was redundant and was removed — which also removed the ANR.
+- **Cold boot.** A fresh emulator is slow and prone to system ANRs. CI caches
   the AVD and boots from a snapshot, and waits for `sys.boot_completed` before
   running tests.
 - **WebDriverAgent cold start.** The first XCUITest session built WDA with
   `xcodebuild` and blew past the connection timeout (~331 s observed). CI
   downloads a prebuilt WDA and enables `usePreinstalledWDA`, avoiding the build.
-- **App not in the foreground.** `activateApp` resolves before the app is
-  actually foreground. The reset now waits for Appium's
-  `RUNNING_IN_FOREGROUND` state — independent of whichever screen each test
-  expects.
 - **Duplicate CI runs.** Feature branches were triggering both `push` and
   `pull_request`. The `push` trigger is now limited to `main`.
 
