@@ -27,6 +27,7 @@ fi
 
 export ANDROID_UDID
 echo "Running Android tests against emulator: ${ANDROID_UDID}"
+export ALLURE_OUTPUT_DIR="${ALLURE_OUTPUT_DIR:-allure-results/android}"
 echo "Waiting for the emulator to report boot completed..."
 adb -s "${ANDROID_UDID}" wait-for-device
 for _ in $(seq 1 60); do

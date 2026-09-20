@@ -26,7 +26,14 @@ export const config: Options.Testrunner = {
 
   services: ['appium'],
   framework: 'mocha',
-  reporters: ['spec'],
+  reporters: [
+    'spec',
+    ['allure', {
+      outputDir: process.env.ALLURE_OUTPUT_DIR ?? 'allure-results',
+      disableWebdriverStepsReporting: true,
+      disableWebdriverScreenshotsReporting: false,
+    }],
+  ],
 
   mochaOpts: {
     ui: 'bdd',

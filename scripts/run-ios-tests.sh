@@ -52,6 +52,7 @@ select_simulator() {
 SIMULATOR="$(select_simulator)"
 IFS='|' read -r IOS_UDID IOS_DEVICE_NAME IOS_PLATFORM_VERSION <<< "${SIMULATOR}"
 export IOS_UDID IOS_DEVICE_NAME IOS_PLATFORM_VERSION
+export ALLURE_OUTPUT_DIR="${ALLURE_OUTPUT_DIR:-allure-results/ios}"
 
 # Download a prebuilt WebDriverAgent for the simulator instead of building it
 # with xcodebuild on the first session.
