@@ -21,6 +21,9 @@ jobs:
     runs-on: macos-14
     timeout-minutes: 45
 
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,3 +50,32 @@ jobs:
           name: ios-test-logs
           path: logs/
           if-no-files-found: ignore
+
+      - name: Generate Allure report
+        if: always()
+        run: npx allure generate allure-results/ios --clean -o allure-report/ios
+
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-allure-report
+          path: allure-report/ios/
+          if-no-files-found: ignore
+
+      - name: Publish report to GitHub Pages
+        if: github.ref == 'refs/heads/main' && always()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report/ios
+          destination_dir: ios
+          keep_files: true
+
+      - name: Publish index page to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./pages
+          keep_files: true
