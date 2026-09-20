@@ -1,4 +1,4 @@
 "DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
-"","7522","shows a native validation alert when fields are missing","Authentication (iOS)","2026-09-20","passed","2026-09-20","","","",""
-"","7179","logs in successfully with valid credentials","Authentication","2026-09-20","passed","2026-09-20","","","",""
-"","11807","adds a product to the cart and updates the badge","Shopping cart","2026-09-20","passed","2026-09-20","","","",""
+"","6076","adds a product to the cart and updates the badge","Shopping cart","2026-09-20","passed","2026-09-20","","","",""
+"","5376","shows a native validation alert when fields are missing","Authentication (iOS)","2026-09-20","passed","2026-09-20","","","",""
+"","5067","logs in successfully with valid credentials","Authentication","2026-09-20","passed","2026-09-20","","","",""
