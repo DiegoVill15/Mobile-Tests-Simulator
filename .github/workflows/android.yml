@@ -112,7 +112,7 @@ jobs:
           if-no-files-found: ignore
           
       - name: Publish report to GitHub Pages
-        if: github.ref == 'refs/heads/main' && always()
+        if: github.ref == 'refs/heads/main' && success()
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
