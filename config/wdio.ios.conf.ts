@@ -18,6 +18,21 @@ if (process.env.IOS_UDID) {
   capabilities['appium:udid'] = process.env.IOS_UDID
 }
 
+// When the runner script provides a prebuilt WebDriverAgent, tell XCUITest to
+// install and use it instead of building WDA with xcodebuild on session start.
+// This requires iOS 17+ (see the preinstalled-WDA guide in the Appium docs).
+if (process.env.IOS_PREBUILT_WDA) {
+  const platformMajor = Number((process.env.IOS_PLATFORM_VERSION ?? '27.0').split('.')[0])
+  if (!Number.isInteger(platformMajor) || platformMajor < 17) {
+    throw new Error(
+      `Prebuilt WebDriverAgent requires iOS 17+, but the simulator runtime is ${process.env.IOS_PLATFORM_VERSION}`,
+    )
+  }
+  const appiumCapabilities = capabilities as Record<string, unknown>
+  appiumCapabilities['appium:usePreinstalledWDA'] = true
+  appiumCapabilities['appium:prebuiltWDAPath'] = process.env.IOS_PREBUILT_WDA
+}
+
 export const config: WebdriverIO.Config = {
   ...sharedConfig,
   specs: [

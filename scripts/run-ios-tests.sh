@@ -53,6 +53,21 @@ SIMULATOR="$(select_simulator)"
 IFS='|' read -r IOS_UDID IOS_DEVICE_NAME IOS_PLATFORM_VERSION <<< "${SIMULATOR}"
 export IOS_UDID IOS_DEVICE_NAME IOS_PLATFORM_VERSION
 
+# Download a prebuilt WebDriverAgent for the simulator instead of building it
+# with xcodebuild on the first session.
+WDA_DIR="$(mktemp -d)/wda"
+echo "Downloading prebuilt WebDriverAgent..."
+npx appium driver run xcuitest download-wda \
+  -- --kind sim --platform iOS --outdir "${WDA_DIR}"
+
+IOS_PREBUILT_WDA="$(find "${WDA_DIR}" -type d -name 'WebDriverAgentRunner-Runner.app' -print -quit)"
+if [ -z "${IOS_PREBUILT_WDA}" ]; then
+  echo "Could not find WebDriverAgentRunner-Runner.app in ${WDA_DIR}" >&2
+  exit 1
+fi
+export IOS_PREBUILT_WDA
+echo "Using prebuilt WebDriverAgent: ${IOS_PREBUILT_WDA}"
+
 echo "Booting simulator: ${IOS_DEVICE_NAME} (iOS ${IOS_PLATFORM_VERSION}) [${IOS_UDID}]"
 xcrun simctl bootstatus "${IOS_UDID}" -b
 
