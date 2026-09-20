@@ -51,7 +51,10 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      # Caching the AVD and booting from a snapshot avoids the cold boot.
+      # A fresh emulator uses a cold boot, which is slow and prone to system ANR
+      # dialogs that hide the app under test. Caching the AVD and booting from a
+      # snapshot avoids the cold boot. The key is versioned so a snapshot saved
+      # in a bad state is discarded when the configuration changes.
       # Pattern from the android-emulator-runner README.
       - name: AVD cache
         uses: actions/cache@v4
@@ -60,7 +63,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-34-${{ runner.os }}
+          key: avd-34-v2-${{ runner.os }}
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'

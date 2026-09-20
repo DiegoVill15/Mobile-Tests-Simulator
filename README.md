@@ -137,12 +137,15 @@ Real problems found while getting the suite green on CI, and how they were solve
 - **iOS simulator build.** The React Native iOS artifact is x86_64-only, so it
   cannot run on arm64 Apple Silicon simulators or `macos-14` runners. The suite
   uses the native arm64 build instead.
-- **Emulator ANR from the per-test reset.** To isolate tests we restarted the app
-  before each one (`terminate → activate`). On the CI emulator that cycle raced
-  with the system launcher and triggered a *"Pixel Launcher isn't responding"*
-  dialog that covered the app and failed every test. Since each spec already
-  runs in its **own session** (WebdriverIO launches the app per worker), the
-  reset was redundant and was removed — which also removed the ANR.
+- **Emulator launcher ANR.** On a loaded CI runner the emulator's launcher
+  (Pixel Launcher) can become unresponsive and pop a *"Pixel Launcher isn't
+  responding"* dialog. The dialog takes over the screen, so the app under test
+  never reaches the foreground and every test fails with a timeout. CI now sets
+  `hide_error_dialogs` so the system never shows that dialog.
+- **Redundant per-test reset.** We used to restart the app before each test to
+  isolate state. Since each spec already runs in its **own session** (WebdriverIO
+  launches the app per worker), the reset added nothing and made the launcher
+  ANR above more likely, so it was removed.
 - **Cold boot.** A fresh emulator is slow and prone to system ANRs. CI caches
   the AVD and boots from a snapshot, and waits for `sys.boot_completed` before
   running tests.
