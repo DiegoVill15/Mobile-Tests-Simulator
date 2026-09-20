@@ -42,6 +42,8 @@ if [ "$(adb -s "${ANDROID_UDID}" shell getprop sys.boot_completed 2>/dev/null | 
 fi
 echo "Boot completed."
 
+adb -s "${ANDROID_UDID}" shell settings put global hide_error_dialogs 1
+
 # Preserve Android system errors even when WebdriverIO exits unsuccessfully.
 collect_logcat() {
   adb -s "${ANDROID_UDID}" logcat -d -v threadtime > logs/android-logcat.log 2>&1 || true

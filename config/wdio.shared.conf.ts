@@ -39,14 +39,4 @@ export const config: Options.Testrunner = {
     ui: 'bdd',
     timeout: 120_000,
   },
-
-  /**
-   * Reset the app to a known state before every test. The app persists the
-   * session between launches, so without this a state change from one test
-   * (e.g. being logged in) could leak into the next one.
-   */
-  beforeTest: async function () {
-    const { resetApp } = await import('../test/support/app')
-    await resetApp()
-  },
 }
