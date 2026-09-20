@@ -1,0 +1,4 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","9949","logs in successfully with valid credentials","Authentication","2026-09-20","passed","2026-09-20","","","",""
+"","10814","adds a product to the cart and updates the badge","Shopping cart","2026-09-20","passed","2026-09-20","","","",""
+"","12075","shows an inline error for invalid credentials","Authentication (Android)","2026-09-20","passed","2026-09-20","","","",""
