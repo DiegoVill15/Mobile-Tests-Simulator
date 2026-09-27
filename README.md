@@ -116,12 +116,17 @@ npm run typecheck          # TypeScript check
 For Appium Inspector, use `npm run appium:start` and `npm run appium:stop`.
 Only browser clients that need CORS require `npm run appium:start -- --allow-cors`.
 The stop command only stops the Appium process started by this project.
+To run both suites at once, use `npm run test:android` and `npm run test:ios`
+in separate terminals. Their Appium servers use separate ports.
 
 ### Reports locally
 
+By default, each test run replaces only its platform's previous Allure results. Run the
+tests before opening the reports. The command regenerates both reports from
+the latest saved results and opens an index to choose Android or iOS.
+
 ```bash
-npx allure generate allure-results/android --clean -o allure-report/android
-npx allure open allure-report/android
+npm run allure:open
 ```
 
 ## CI pipeline
@@ -158,8 +163,9 @@ Real problems found while getting the suite green on CI, and how they were solve
   the AVD and boots from a snapshot, and waits for `sys.boot_completed` before
   running tests.
 - **WebDriverAgent cold start.** The first XCUITest session built WDA with
-  `xcodebuild` and blew past the connection timeout (~331 s observed). CI
-  downloads a prebuilt WDA and enables `usePreinstalledWDA`, avoiding the build.
+  `xcodebuild` and blew past the connection timeout (~331 s observed). The
+  runner now installs a prebuilt WDA once; each spec launches that installation.
+  iOS also keeps the app installed between specs when its version is unchanged.
 - **Duplicate CI runs.** Feature branches were triggering both `push` and
   `pull_request`. The `push` trigger is now limited to `main`.
 

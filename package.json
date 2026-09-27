@@ -10,13 +10,13 @@
   },
   "scripts": {
     "test": "npm run test:android",
-    "test:android": "wdio run config/wdio.android.conf.ts",
+    "test:android": "bash scripts/run-android-tests.sh",
     "test:ios": "bash scripts/run-ios-tests.sh",
     "appium:start": "bash scripts/appium-start.sh",
     "appium:stop": "bash scripts/appium-stop.sh",
     "apps:download": "bash scripts/download-apps.sh",
-    "allure:generate": "allure generate allure-results --clean -o allure-report",
-    "allure:open": "allure open allure-report",
+    "allure:generate": "allure generate allure-results/android --clean -o allure-report/android && allure generate allure-results/ios --clean -o allure-report/ios && cp pages/index.html allure-report/index.html",
+    "allure:open": "npm run allure:generate && allure open allure-report",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [

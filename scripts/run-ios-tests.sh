@@ -15,6 +15,7 @@ set -euo pipefail
 
 # Make sure relative paths (apps/, config/, logs/) resolve from the repo root.
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
+rm -rf allure-results/ios
 
 mkdir -p logs
 
@@ -90,6 +91,9 @@ if [ "${BOOTED}" != "true" ]; then
   exit 1
 fi
 echo "Simulator booted."
+
+echo "Installing prebuilt WebDriverAgent once on ${IOS_DEVICE_NAME}..."
+xcrun simctl install "${IOS_UDID}" "${IOS_PREBUILT_WDA}"
 
 npx wdio run config/wdio.ios.conf.ts --waitforTimeout 20000 2>&1 \
   | tee logs/ios-tests.log
