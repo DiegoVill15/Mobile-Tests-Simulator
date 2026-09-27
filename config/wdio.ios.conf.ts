@@ -9,6 +9,7 @@ const capabilities: WebdriverIO.Capabilities = {
   'appium:deviceName': process.env.IOS_DEVICE_NAME ?? 'iPhone 15',
   'appium:platformVersion': process.env.IOS_PLATFORM_VERSION,
   'appium:app': appPath,
+  'appium:enforceAppInstall': false,
   'appium:newCommandTimeout': 240,
   'appium:wdaLaunchTimeout': 240_000,
   'appium:wdaConnectionTimeout': 240_000,
@@ -18,8 +19,8 @@ if (process.env.IOS_UDID) {
   capabilities['appium:udid'] = process.env.IOS_UDID
 }
 
-// When the runner script provides a prebuilt WebDriverAgent, tell XCUITest to
-// install and use it instead of building WDA with xcodebuild on session start.
+// The runner script installs WDA once; each session then launches that copy
+// without rebuilding or reinstalling it.
 // This requires iOS 17+ (see the preinstalled-WDA guide in the Appium docs).
 if (process.env.IOS_PREBUILT_WDA) {
   const platformMajor = Number(process.env.IOS_PLATFORM_VERSION?.split('.')[0])
@@ -30,7 +31,6 @@ if (process.env.IOS_PREBUILT_WDA) {
   }
   const appiumCapabilities = capabilities as Record<string, unknown>
   appiumCapabilities['appium:usePreinstalledWDA'] = true
-  appiumCapabilities['appium:prebuiltWDAPath'] = process.env.IOS_PREBUILT_WDA
 }
 
 export const config: WebdriverIO.Config = {
