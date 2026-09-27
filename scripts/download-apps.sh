@@ -8,7 +8,7 @@
 #   - iOS:     native build. The React Native iOS simulator artifact is x86_64
 #              only and cannot run on Apple Silicon simulators, which are arm64.
 #
-# Usage: npm run apps:download
+# Usage: npm run apps:download -- android|ios|all (default: all)
 #
 set -euo pipefail
 
@@ -22,25 +22,34 @@ IOS_BASE_URL="https://github.com/saucelabs/my-demo-app-ios/releases/download/${I
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APPS_DIR="${ROOT_DIR}/apps"
-TMP_DIR="$(mktemp -d)"
-trap 'rm -rf "${TMP_DIR}"' EXIT
-
-mkdir -p "${APPS_DIR}/ios"
-
-echo "Downloading Android APK (${ANDROID_APK})..."
-curl -sSL -o "${APPS_DIR}/Android-MyDemoAppRN.apk" "${RN_BASE_URL}/${ANDROID_APK}"
-
-echo "Downloading iOS Simulator build (${IOS_SIM_ZIP})..."
-curl -sSL -o "${TMP_DIR}/${IOS_SIM_ZIP}" "${IOS_BASE_URL}/${IOS_SIM_ZIP}"
-unzip -oq "${TMP_DIR}/${IOS_SIM_ZIP}" -d "${TMP_DIR}/ios"
-
-APP_PATH="$(find "${TMP_DIR}/ios" -maxdepth 3 -name '*.app' -type d | head -1)"
-if [ -z "${APP_PATH}" ]; then
-  echo "Could not find a .app bundle inside ${IOS_SIM_ZIP}" >&2
-  exit 1
+PLATFORM="${1:-all}"
+if [ "$#" -gt 1 ] || [[ ! "${PLATFORM}" =~ ^(android|ios|all)$ ]]; then
+  echo "Usage: npm run apps:download -- android|ios|all" >&2
+  exit 2
 fi
 
-rm -rf "${APPS_DIR}/ios/SauceLabs-Demo-App.app"
-cp -R "${APP_PATH}" "${APPS_DIR}/ios/SauceLabs-Demo-App.app"
+if [ "${PLATFORM}" = android ] || [ "${PLATFORM}" = all ]; then
+  mkdir -p "${APPS_DIR}"
+  echo "Downloading Android APK (${ANDROID_APK})..."
+  curl -fsSL -o "${APPS_DIR}/Android-MyDemoAppRN.apk" "${RN_BASE_URL}/${ANDROID_APK}"
+fi
+
+if [ "${PLATFORM}" = ios ] || [ "${PLATFORM}" = all ]; then
+  TMP_DIR="$(mktemp -d)"
+  trap 'rm -rf "${TMP_DIR}"' EXIT
+  mkdir -p "${APPS_DIR}/ios"
+  echo "Downloading iOS Simulator build (${IOS_SIM_ZIP})..."
+  curl -fsSL -o "${TMP_DIR}/${IOS_SIM_ZIP}" "${IOS_BASE_URL}/${IOS_SIM_ZIP}"
+  unzip -oq "${TMP_DIR}/${IOS_SIM_ZIP}" -d "${TMP_DIR}/ios"
+
+  APP_PATH="$(find "${TMP_DIR}/ios" -maxdepth 3 -name '*.app' -type d | head -1)"
+  if [ -z "${APP_PATH}" ]; then
+    echo "Could not find a .app bundle inside ${IOS_SIM_ZIP}" >&2
+    exit 1
+  fi
+
+  rm -rf "${APPS_DIR}/ios/SauceLabs-Demo-App.app"
+  cp -R "${APP_PATH}" "${APPS_DIR}/ios/SauceLabs-Demo-App.app"
+fi
 
 echo "Done. Binaries available in ${APPS_DIR}"

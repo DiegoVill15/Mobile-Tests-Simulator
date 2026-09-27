@@ -89,11 +89,13 @@ Specs never branch on the platform: they import the factory and use one API.
 
 ## Getting started
 
-**Requirements:** Node.js ≥ 20, Appium drivers and a device/simulator.
+**Requirements:** Node.js ≥ 22.12, Appium drivers and a device/simulator.
 
 ```bash
 npm ci                     # install dependencies
-npm run apps:download all  # download the Android APK and iOS simulator build
+npm run apps:download -- all      # download both apps (default)
+npm run apps:download -- android  # download only the Android APK
+npm run apps:download -- ios      # download only the iOS simulator build
 
 npm run test:android       # run the Android suite
 npm run test:ios           # run the iOS suite
@@ -106,9 +108,14 @@ npm run typecheck          # TypeScript check
   starts and stops its own Appium server via `@wdio/appium-service`; the
   `appium:start` / `appium:stop` scripts are only for a long-running server,
   e.g. to drive Appium Inspector.
-- **iOS:** Xcode with an iOS 17+ simulator runtime. The app under test is an
+- **iOS:** Xcode with an iOS 17+ simulator runtime. `npm run test:ios` selects
+  the newest available iPhone simulator and its installed iOS version. The app under test is an
   **arm64 native build** — the React Native iOS artifact is x86_64-only and does
   not run on Apple Silicon simulators.
+
+For Appium Inspector, use `npm run appium:start` and `npm run appium:stop`.
+Only browser clients that need CORS require `npm run appium:start -- --allow-cors`.
+The stop command only stops the Appium process started by this project.
 
 ### Reports locally
 
@@ -121,13 +128,14 @@ npx allure open allure-report/android
 
 Both workflows run on pull requests to `main` and on pushes to `main`
 (feature branches are validated through the PR, so a branch is never tested
-twice). After the tests, each job generates its Allure report, uploads it as a
-build artifact, and — **only from `main`** — publishes it to GitHub Pages under
-its own subfolder, keeping the other platform's files intact.
+twice). Test jobs have read-only repository access and upload Allure artifacts.
+On `main`, a separate publishing job runs only after successful tests, with
+write access to GitHub Pages. Android and iOS publishing jobs run one at a time
+and preserve the other platform's report.
 
 ```
-tests → Allure report → artifact (every run)
-                     └→ GitHub Pages /android/ · /ios/  (main only)
+tests → Allure report → artifact
+                       └→ publish job → GitHub Pages /android/ · /ios/ (main only)
 ```
 
 ## Engineering notes
