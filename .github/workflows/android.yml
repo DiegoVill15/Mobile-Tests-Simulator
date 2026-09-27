@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 45
 
     permissions:
-      contents: write
+      contents: read
 
     steps:
       - name: Checkout
@@ -29,7 +29,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Set up JDK 17
@@ -41,8 +41,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check helper scripts
+        run: bash scripts/check-scripts.sh
+
       - name: Download app under test
-        run: bash scripts/download-apps.sh
+        run: npm run apps:download -- android
 
       - name: Enable KVM group perms
         run: |
@@ -110,20 +113,30 @@ jobs:
           name: android-allure-report
           path: allure-report/android/
           if-no-files-found: ignore
-          
-      - name: Publish report to GitHub Pages
-        if: github.ref == 'refs/heads/main' && success()
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./allure-report/android
-          destination_dir: android
-          keep_files: true
 
-      - name: Publish index page to GitHub Pages
-        if: github.ref == 'refs/heads/main'
+  publish:
+    name: Publish Android report
+    needs: android
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: pages-publication
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download report
+        uses: actions/download-artifact@v4
+        with:
+          name: android-allure-report
+          path: site/android
+      - name: Add index page
+        run: cp pages/index.html site/index.html
+      - name: Publish report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./pages
+          publish_dir: ./site
           keep_files: true

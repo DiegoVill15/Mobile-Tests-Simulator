@@ -9,9 +9,15 @@
 #
 # Usage:
 #   npm run appium:start          # start in background (default port 4723)
+#   npm run appium:start -- --allow-cors  # allow browser clients explicitly
 #   APPIUM_PORT=4725 npm run appium:start
 #
 set -euo pipefail
+
+if [ "$#" -gt 1 ] || { [ "$#" -eq 1 ] && [ "$1" != '--allow-cors' ]; }; then
+  echo "Usage: npm run appium:start -- [--allow-cors]" >&2
+  exit 2
+fi
 
 PORT="${APPIUM_PORT:-4723}"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -34,7 +40,7 @@ else
 fi
 
 echo "Starting Appium on http://127.0.0.1:${PORT} ..."
-"${APPIUM_BIN}" --address 127.0.0.1 --port "${PORT}" --allow-cors \
+"${APPIUM_BIN}" --address 127.0.0.1 --port "${PORT}" --log "${LOG_FILE}" "$@" \
   >"${LOG_FILE}" 2>&1 &
 echo $! >"${PID_FILE}"
 

@@ -4,26 +4,21 @@
 #
 set -euo pipefail
 
-PORT="${APPIUM_PORT:-4723}"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PID_FILE="${ROOT_DIR}/logs/appium.pid"
+LOG_FILE="${ROOT_DIR}/logs/appium.log"
 
 if [ -f "${PID_FILE}" ]; then
   PID="$(cat "${PID_FILE}")"
-  if kill "${PID}" >/dev/null 2>&1; then
+  COMMAND="$(ps -p "${PID}" -o command= 2>/dev/null || true)"
+  if [[ "${COMMAND}" == *appium* && "${COMMAND}" == *"--log ${LOG_FILE}"* ]] && kill "${PID}" >/dev/null 2>&1; then
     echo "Stopped Appium (pid ${PID})."
   else
-    echo "Appium process ${PID} was not running."
+    echo "No project Appium process found for pid ${PID}."
   fi
   rm -f "${PID_FILE}"
 else
   echo "No PID file found."
-fi
-
-# Fallback: free the port if something is still listening on it.
-if lsof -nP -iTCP:"${PORT}" -sTCP:LISTEN >/dev/null 2>&1; then
-  echo "Port ${PORT} still in use, freeing it..."
-  lsof -nP -tiTCP:"${PORT}" -sTCP:LISTEN | xargs kill >/dev/null 2>&1 || true
 fi
 
 echo "Done."
