@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "npm run test:android",
-    "test:android": "wdio run config/wdio.android.conf.ts",
+    "test:android": "bash scripts/run-android-tests.sh",
     "test:ios": "bash scripts/run-ios-tests.sh",
     "appium:start": "bash scripts/appium-start.sh",
     "appium:stop": "bash scripts/appium-stop.sh",

@@ -45,7 +45,7 @@ export const config: WebdriverIO.Config = {
    * 30s is not always enough and the run fails with "Appium did not start
    * within expected time" before any test can run.
    */
-  services: [['appium', { appiumStartTimeout: 120_000 }]],
+  services: [['appium', { appiumStartTimeout: 120_000, args: { port: 4725 } }]],
   /**
    * Keep extra room for simulator startup and Appium session creation on CI.
    */

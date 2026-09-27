@@ -116,12 +116,19 @@ npm run typecheck          # TypeScript check
 For Appium Inspector, use `npm run appium:start` and `npm run appium:stop`.
 Only browser clients that need CORS require `npm run appium:start -- --allow-cors`.
 The stop command only stops the Appium process started by this project.
+To run both suites at once, use `npm run test:android` and `npm run test:ios`
+in separate terminals. Their Appium servers use separate ports.
 
 ### Reports locally
+
+By default, each test run replaces only its platform's previous Allure results. Run the
+tests before generating a report so it shows the current execution.
 
 ```bash
 npx allure generate allure-results/android --clean -o allure-report/android
 npx allure open allure-report/android
+npx allure generate allure-results/ios --clean -o allure-report/ios
+npx allure open allure-report/ios
 ```
 
 ## CI pipeline

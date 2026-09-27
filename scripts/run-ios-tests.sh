@@ -15,6 +15,7 @@ set -euo pipefail
 
 # Make sure relative paths (apps/, config/, logs/) resolve from the repo root.
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
+rm -rf allure-results/ios
 
 mkdir -p logs
 
